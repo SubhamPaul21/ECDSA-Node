@@ -1,9 +1,9 @@
 # ECDSA-Node
 This is the first week project of Ethereum Developer BootCamp by Alchemy University.
 
-This project is an example of using a client and server to facilitate transfers between different addresses. Since there is just a single server on the back-end handling transfers, this is clearly very centralized. We won't worry about distributed consensus for this project.
+This project is an example of using a client and server to facilitate transfers between different addresses. This is clearly very centralized since there is just a single server on the back end handling transfers. However, we have incorporated Public Key Cryptography. 
 
-However, something that we would like to incoporate is Public Key Cryptography. By using Elliptic Curve Digital Signatures we can make it so the server only allows transfers that have been signed for by the person who owns the associated address.
+By using the Elliptic Curve Digital Signature Algorithm, we have made the server only allow transfers signed for by the person who owns the associated address.
 
 ## Video instructions
 For an overview of this project as well as getting started instructions, check out the following video:
