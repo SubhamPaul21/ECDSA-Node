@@ -1,16 +1,18 @@
-const express = require("express");
+import express, { json } from "express";
 const app = express();
-const cors = require("cors");
+import cors from "cors";
 const port = 3042;
+import privateKeyList from "./key_generator.js";
 
 app.use(cors());
-app.use(express.json());
+app.use(json());
 
-const balances = {
-  "0x1": 100,
-  "0x2": 50,
-  "0x3": 75,
-};
+const balances = {};
+
+balances[privateKeyList.at(0)] = 100;
+balances[privateKeyList.at(1)] = 50;
+balances[privateKeyList.at(2)] = 75;
+
 
 app.get("/balance/:address", (req, res) => {
   const { address } = req.params;
