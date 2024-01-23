@@ -15,12 +15,12 @@ function Transfer({ address, setBalance }) {
 
     try {
       if (secp256k1.utils.isValidPrivateKey(recipient) && secp256k1.utils.isValidPrivateKey(address)) {
-        const publicKey = secp256k1.getPublicKey(address);
-        const message = `${address} sent Amount: ${parseInt(sendAmount)} to ${recipient}`;
-        console.log("Transaction Message: ", message);
+        const userPublicKey = secp256k1.getPublicKey(address);
+        const recipientPublicKey = secp256k1.getPublicKey(recipient);
+        const message = `${userPublicKey} sent Amount: ${parseInt(sendAmount)} to ${recipientPublicKey}`;
         const messageHash = keccak256(utf8ToBytes(message));
         const signature = secp256k1.sign(messageHash, address);
-        const isVerified = secp256k1.verify(signature, messageHash, publicKey);
+        const isVerified = secp256k1.verify(signature, messageHash, userPublicKey);
 
         if (isVerified) {
           const {
