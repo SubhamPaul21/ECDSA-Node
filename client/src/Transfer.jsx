@@ -52,8 +52,12 @@ function Transfer({ address, setBalance }) {
         throw new Error(JSON.stringify(error));
       }
     } catch (ex) {
-      const message = JSON.parse(ex.message);
-      alert(message.response.data.message);
+      if (ex.message) {
+        const message = JSON.parse(ex.message);
+        alert(message.response.data.message);
+      } else {
+        alert("Invalid action");
+      }
     }
   }
 
