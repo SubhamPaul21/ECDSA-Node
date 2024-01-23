@@ -1,5 +1,8 @@
 import { useState } from "react";
 import server from "./server";
+import { secp256k1 } from "ethereum-cryptography/secp256k1.js";
+import { toHex, utf8ToBytes } from "ethereum-cryptography/utils.js";
+import { keccak256 } from "ethereum-cryptography/keccak.js";
 
 function Transfer({ address, setBalance }) {
   const [sendAmount, setSendAmount] = useState("");
@@ -11,16 +14,46 @@ function Transfer({ address, setBalance }) {
     evt.preventDefault();
 
     try {
-      const {
-        data: { balance },
-      } = await server.post(`send`, {
-        sender: address,
-        amount: parseInt(sendAmount),
-        recipient,
-      });
-      setBalance(balance);
+      if (secp256k1.utils.isValidPrivateKey(recipient) && secp256k1.utils.isValidPrivateKey(address)) {
+        const publicKey = secp256k1.getPublicKey(address);
+        const message = `${address} sent Amount: ${parseInt(sendAmount)} to ${recipient}`;
+        console.log("Transaction Message: ", message);
+        const messageHash = keccak256(utf8ToBytes(message));
+        const signature = secp256k1.sign(messageHash, address);
+        const isVerified = secp256k1.verify(signature, messageHash, publicKey);
+
+        if (isVerified) {
+          const {
+            data: { balance },
+          } = await server.post(`send`, {
+            sender: address,
+            amount: parseInt(sendAmount),
+            recipient,
+          });
+          setBalance(balance);
+        } else {
+          const error = {
+            "response": {
+              "data": {
+                "message": "Unverified User",
+              }
+            }
+          };
+          throw new Error(JSON.stringify(error));
+        }
+      } else {
+        const error = {
+          "response": {
+            "data": {
+              "message": "Invalid Private Key",
+            }
+          }
+        };
+        throw new Error(JSON.stringify(error));
+      }
     } catch (ex) {
-      alert(ex.response.data.message);
+      const message = JSON.parse(ex.message);
+      alert(message.response.data.message);
     }
   }
 
@@ -40,7 +73,7 @@ function Transfer({ address, setBalance }) {
       <label>
         Recipient
         <input
-          placeholder="Type an address, for example: 0x2"
+          placeholder="Type the public address of Recipient"
           value={recipient}
           onChange={setValue(setRecipient)}
         ></input>
